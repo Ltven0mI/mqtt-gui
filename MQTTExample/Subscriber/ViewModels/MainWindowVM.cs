@@ -1,4 +1,6 @@
-﻿using MVVMUtil;
+﻿using CommonClasses;
+using MVVMUtil;
+using Subscriber.Services.Interfaces;
 using Subscriber.ViewModels.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -70,18 +72,44 @@ namespace Subscriber.ViewModels
 
     #region Commands
 
-    #region Command - StartStopCommand
-    private RelayCommand _startStopCommand;
-    public ICommand StartStopCommand
+    #region Command - StartCommand
+    private RelayCommand _startCommand;
+    public ICommand StartCommand
     {
-      get => _startStopCommand ??= new RelayCommand(
+      get => _startCommand ??= new RelayCommand(
         _ =>
         {
-          MessageBox.Show("Start / Stop");
-        }
+          // Sanitize Address
+          Address = Address?.Trim();
+
+          // If Address Empty: Inform User, Return
+          if (string.IsNullOrWhiteSpace(Address))
+          {
+            MessageBox.Show("Please enter a valid address, then try again.", "Invalid Address");
+            return;
+          }
+
+          // Attempt Connection
+          SubscriberService.Connect(Address, Port);
+        },
+        _ => SubscriberService.ConnectionState == ClientConnectionState.Disconnected
       );
     }
-    #endregion Command - StartStopCommand
+    #endregion Command - StartCommand
+
+    #region Command - StopCommand
+    private RelayCommand _stopCommand;
+    public ICommand StopCommand
+    {
+      get => _stopCommand ??= new RelayCommand(
+        _ =>
+        {
+          SubscriberService.Disconnect();
+        },
+        _ => SubscriberService.ConnectionState != ClientConnectionState.Disconnected
+      );
+    }
+    #endregion Command - StopCommand
 
     #region Command - SubscribeCommand
     private RelayCommand _subscribeCommand;
@@ -91,7 +119,8 @@ namespace Subscriber.ViewModels
         _ =>
         {
           MessageBox.Show("Subscribe");
-        }
+        },
+        _ => SubscriberService.ConnectionState == ClientConnectionState.Connected
       );
     }
     #endregion Command - SubscribeCommand
@@ -104,7 +133,8 @@ namespace Subscriber.ViewModels
         _ =>
         {
           MessageBox.Show("Unsubscribe");
-        }
+        },
+        _ => SubscriberService.ConnectionState == ClientConnectionState.Connected
       );
     }
     #endregion UnsubscribeCommand
@@ -115,6 +145,70 @@ namespace Subscriber.ViewModels
     #endregion Models
 
     #region Services
+    private ISubscriberService _subscriberService;
+    [Unity.Dependency]
+    public ISubscriberService SubscriberService
+    {
+      get => _subscriberService;
+      set
+      {
+        // Deregister Callbacks
+        if (_subscriberService != null)
+        {
+          _subscriberService.ConnectionSuccessful -= SubscriberService_ConnectionSuccessful;
+          _subscriberService.ConnectionCancelled -= SubscriberService_ConnectionCancelled;
+          _subscriberService.ConnectionAttemptFailed -= SubscriberService_ConnectionAttemptFailed;
+          _subscriberService.ConnectionFailed -= SubscriberService_ConnectionFailed;
+          _subscriberService.ConnectionLost -= SubscriberService_ConnectionLost;
+          _subscriberService.ConnectionClosed -= SubscriberService_ConnectionClosed;
+        }
+
+        _subscriberService = value;
+
+        // Register Callbacks
+        if (_subscriberService != null)
+        {
+          _subscriberService.ConnectionSuccessful += SubscriberService_ConnectionSuccessful;
+          _subscriberService.ConnectionCancelled += SubscriberService_ConnectionCancelled;
+          _subscriberService.ConnectionAttemptFailed += SubscriberService_ConnectionAttemptFailed;
+          _subscriberService.ConnectionFailed += SubscriberService_ConnectionFailed;
+          _subscriberService.ConnectionLost += SubscriberService_ConnectionLost;
+          _subscriberService.ConnectionClosed += SubscriberService_ConnectionClosed;
+        }
+      }
+    }
     #endregion Services
+
+
+    #region Callback Handlers
+
+    #region Source Group - SubscriberService
+    private void SubscriberService_ConnectionSuccessful(object sender, EventArgs e)
+    {
+      LogText += $"[SYS] Connection Successful!{Environment.NewLine}";
+    }
+    private void SubscriberService_ConnectionCancelled(object sender, EventArgs e)
+    {
+      LogText += $"[SYS] Connection Cancelled!{Environment.NewLine}";
+    }
+    private void SubscriberService_ConnectionAttemptFailed(object sender, EventArgs e)
+    {
+      LogText += $"[SYS] Connection Attempt Failed!{Environment.NewLine}";
+    }
+    private void SubscriberService_ConnectionFailed(object sender, EventArgs e)
+    {
+      LogText += $"[SYS] Connection Failed!{Environment.NewLine}";
+    }
+    private void SubscriberService_ConnectionLost(object sender, EventArgs e)
+    {
+      LogText += $"[SYS] Connection Lost!{Environment.NewLine}";
+    }
+    private void SubscriberService_ConnectionClosed(object sender, EventArgs e)
+    {
+      LogText += $"[SYS] Connection Closed!{Environment.NewLine}";
+    }
+    #endregion Source Group - SubscriberService
+
+    #endregion Callback Handlers
   }
 }
