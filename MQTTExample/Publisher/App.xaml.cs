@@ -1,4 +1,6 @@
-﻿using Publisher.ViewModels;
+﻿using Publisher.Services;
+using Publisher.Services.Interfaces;
+using Publisher.ViewModels;
 using Publisher.ViewModels.Interfaces;
 using Publisher.Views;
 using System;
@@ -25,6 +27,7 @@ namespace Publisher
       var container = new UnityContainer();
 
       // Register Services
+      container.RegisterType<IPublisherService, PublisherService>();
 
       // Register ViewModels
       container.RegisterType<IViewMainWindowVM, MainWindowVM>();

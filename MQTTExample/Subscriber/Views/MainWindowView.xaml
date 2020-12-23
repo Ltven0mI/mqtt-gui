@@ -5,17 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Subscriber"
         mc:Ignorable="d"
-        Title="MQTT Subscriber Client" Height="auto" Width="auto" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
+        Title="MQTT Subscriber Client" Height="auto" Width="auto" MaxHeight="300" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
   <Grid Margin="10,10,10,15">
-    <TextBox x:Name="Log_TextBox" HorizontalAlignment="Left" Margin="265,0,0,0" TextWrapping="Wrap" VerticalAlignment="Stretch" Width="245" IsReadOnly="True" Text="{Binding LogText}"/>
-    <TextBox x:Name="Address_TextBox" HorizontalAlignment="Left" Margin="60,4,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" Text="{Binding Address}"/>
-    <TextBox x:Name="Port_TextBox" HorizontalAlignment="Left" Margin="60,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Text="{Binding Port}"/>
     <Label x:Name="Address_Label" Content="Address:" HorizontalAlignment="Left" VerticalAlignment="Top"/>
     <Label x:Name="Port_Label" Content="Port:" HorizontalAlignment="Left" Margin="0,31,0,0" VerticalAlignment="Top"/>
-    <Button x:Name="StartStop_Button" Content="Start Subscriber" HorizontalAlignment="Left" Margin="0,62,0,0" VerticalAlignment="Top" Width="260" Command="{Binding StartStopCommand}"/>
-    <TextBox x:Name="Topic_TextBox" HorizontalAlignment="Left" Margin="60,136,0,0" Text="{Binding Topic}" TextWrapping="Wrap" VerticalAlignment="Top" Width="200"/>
+    <TextBox x:Name="Address_TextBox" HorizontalAlignment="Left" Margin="60,4,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" Text="{Binding Address}"/>
+    <TextBox x:Name="Port_TextBox" HorizontalAlignment="Left" Margin="60,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Text="{Binding Port}"/>
+    <Button x:Name="Start_Button" Content="Start Subscriber" HorizontalAlignment="Left" Margin="0,62,0,0" VerticalAlignment="Top" Width="260" Command="{Binding StartCommand}"/>
+    <Button x:Name="Stop_Button" Content="Stop Subscriber" HorizontalAlignment="Left" Margin="0,87,0,0" VerticalAlignment="Top" Width="260" Command="{Binding StopCommand}"/>
+    <TextBox x:Name="Log_TextBox" HorizontalAlignment="Left" Margin="265,0,0,0" VerticalAlignment="Stretch" TextWrapping="Wrap" Width="245" IsReadOnly="True" Text="{Binding LogText}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalScrollBarVisibility="Auto" IsUndoEnabled="False"/>
     <Label x:Name="Topic_Label" Content="Topic:" HorizontalAlignment="Left" Margin="0,132,0,0" VerticalAlignment="Top"/>
-    <Button x:Name="Unsub_Button" Content="Unsubscribe" HorizontalAlignment="Left" Margin="134,163,0,0" VerticalAlignment="Top" Width="126" Command="{Binding UnsubscribeCommand}"/>
+    <TextBox x:Name="Topic_TextBox" HorizontalAlignment="Left" Margin="60,136,0,0" Text="{Binding Topic}" TextWrapping="NoWrap" VerticalAlignment="Top" Width="200"/>
     <Button x:Name="Sub_Button" Content="Subscribe" HorizontalAlignment="Left" Margin="0,163,0,0" VerticalAlignment="Top" Width="126" Command="{Binding SubscribeCommand}"/>
+    <Button x:Name="Unsub_Button" Content="Unsubscribe" HorizontalAlignment="Left" Margin="134,163,0,0" VerticalAlignment="Top" Width="126" Command="{Binding UnsubscribeCommand}"/>
   </Grid>
 </Window>
