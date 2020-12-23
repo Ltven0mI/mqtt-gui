@@ -70,6 +70,7 @@ namespace Subscriber.ViewModels
 
     #endregion Properties
 
+
     #region Commands
 
     #region Command - StartCommand
@@ -118,7 +119,18 @@ namespace Subscriber.ViewModels
       get => _subscribeCommand ??= new RelayCommand(
         _ =>
         {
-          MessageBox.Show("Subscribe");
+          // Sanitize Topic.
+          Topic = Topic?.Trim();
+
+          // Ensure Topic is Valid //
+          if (string.IsNullOrWhiteSpace(Topic))
+          {
+            MessageBox.Show("Please enter a valid topic.", "Invalid Topic");
+            return;
+          }
+
+          SubscriberService.Subscribe(Topic);
+          Topic = "";
         },
         _ => SubscriberService.ConnectionState == ClientConnectionState.Connected
       );
@@ -132,7 +144,18 @@ namespace Subscriber.ViewModels
       get => _unsubscribeCommand ??= new RelayCommand(
         _ =>
         {
-          MessageBox.Show("Unsubscribe");
+          // Sanitize Topic.
+          Topic = Topic?.Trim();
+
+          // Ensure Topic is Valid //
+          if (string.IsNullOrWhiteSpace(Topic))
+          {
+            MessageBox.Show("Please enter a valid topic.", "Invalid Topic");
+            return;
+          }
+
+          SubscriberService.Unsubscribe(Topic);
+          Topic = "";
         },
         _ => SubscriberService.ConnectionState == ClientConnectionState.Connected
       );
@@ -141,10 +164,14 @@ namespace Subscriber.ViewModels
 
     #endregion Commands
 
+
     #region Models
     #endregion Models
 
+
     #region Services
+
+    #region Service - SubscriberService
     private ISubscriberService _subscriberService;
     [Unity.Dependency]
     public ISubscriberService SubscriberService
@@ -161,6 +188,9 @@ namespace Subscriber.ViewModels
           _subscriberService.ConnectionFailed -= SubscriberService_ConnectionFailed;
           _subscriberService.ConnectionLost -= SubscriberService_ConnectionLost;
           _subscriberService.ConnectionClosed -= SubscriberService_ConnectionClosed;
+          _subscriberService.Subscribed -= SubscriberService_Subscribed;
+          _subscriberService.Unsubscribed -= SubscriberService_Unsubscribed;
+          _subscriberService.MessageReceived -= SubscriberService_MessageReceived;
         }
 
         _subscriberService = value;
@@ -174,9 +204,14 @@ namespace Subscriber.ViewModels
           _subscriberService.ConnectionFailed += SubscriberService_ConnectionFailed;
           _subscriberService.ConnectionLost += SubscriberService_ConnectionLost;
           _subscriberService.ConnectionClosed += SubscriberService_ConnectionClosed;
+          _subscriberService.Subscribed += SubscriberService_Subscribed;
+          _subscriberService.Unsubscribed += SubscriberService_Unsubscribed;
+          _subscriberService.MessageReceived += SubscriberService_MessageReceived;
         }
       }
     }
+    #endregion Service - SubscriberService
+
     #endregion Services
 
 
@@ -206,6 +241,18 @@ namespace Subscriber.ViewModels
     private void SubscriberService_ConnectionClosed(object sender, EventArgs e)
     {
       LogText += $"[SYS] Connection Closed!{Environment.NewLine}";
+    }
+    private void SubscriberService_Subscribed(object sender, SubscriptionEventArgs e)
+    {
+      LogText += $"[SUB] '{e.Topic}' {Environment.NewLine}";
+    }
+    private void SubscriberService_Unsubscribed(object sender, SubscriptionEventArgs e)
+    {
+      LogText += $"[UNSUB] '{e.Topic}' {Environment.NewLine}";
+    }
+    private void SubscriberService_MessageReceived(object sender, MessageReceivedEventArgs e)
+    {
+      LogText += $"[{e.Topic}] '{e.Payload}' {Environment.NewLine}";
     }
     #endregion Source Group - SubscriberService
 

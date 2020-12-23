@@ -15,7 +15,7 @@
     <Button x:Name="Stop_Button" Content="Stop Subscriber" HorizontalAlignment="Left" Margin="0,87,0,0" VerticalAlignment="Top" Width="260" Command="{Binding StopCommand}"/>
     <TextBox x:Name="Log_TextBox" HorizontalAlignment="Left" Margin="265,0,0,0" VerticalAlignment="Stretch" TextWrapping="Wrap" Width="245" IsReadOnly="True" Text="{Binding LogText}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalScrollBarVisibility="Auto" IsUndoEnabled="False"/>
     <Label x:Name="Topic_Label" Content="Topic:" HorizontalAlignment="Left" Margin="0,132,0,0" VerticalAlignment="Top"/>
-    <TextBox x:Name="Topic_TextBox" HorizontalAlignment="Left" Margin="60,136,0,0" Text="{Binding Topic}" TextWrapping="Wrap" VerticalAlignment="Top" Width="200"/>
+    <TextBox x:Name="Topic_TextBox" HorizontalAlignment="Left" Margin="60,136,0,0" Text="{Binding Topic}" TextWrapping="NoWrap" VerticalAlignment="Top" Width="200"/>
     <Button x:Name="Sub_Button" Content="Subscribe" HorizontalAlignment="Left" Margin="0,163,0,0" VerticalAlignment="Top" Width="126" Command="{Binding SubscribeCommand}"/>
     <Button x:Name="Unsub_Button" Content="Unsubscribe" HorizontalAlignment="Left" Margin="134,163,0,0" VerticalAlignment="Top" Width="126" Command="{Binding UnsubscribeCommand}"/>
   </Grid>

@@ -57,18 +57,18 @@ namespace Publisher.ViewModels
     }
     #endregion Property - Topic
 
-    #region Property - Content
-    private string _content;
-    public string Content
+    #region Property - Payload
+    private string _payload;
+    public string Payload
     {
-      get => _content;
+      get => _payload;
       set
       {
-        _content = value;
-        RaisePropertyChanged(nameof(Content));
+        _payload = value;
+        RaisePropertyChanged(nameof(Payload));
       }
     }
-    #endregion Property - Content
+    #endregion Property - Payload
 
     #region Property - LogText
     private string _logText;
@@ -84,6 +84,7 @@ namespace Publisher.ViewModels
     #endregion Property - LogText
 
     #endregion Properties
+
 
     #region Commands
 
@@ -133,7 +134,24 @@ namespace Publisher.ViewModels
       get => _publishCommand ??= new RelayCommand(
         _ =>
         {
-          MessageBox.Show("Publish");
+          // Input Sanitizing //
+          Topic = Topic?.Trim();
+          Payload = Payload?.Trim();
+
+          // Input Validation //
+          if (string.IsNullOrWhiteSpace(Topic))
+          {
+            MessageBox.Show("Please enter a valid topic.", "Invalid Topic");
+            return;
+          }
+          if(string.IsNullOrWhiteSpace(Payload))
+          {
+            MessageBox.Show("Please enter a valid content.", "Invalid Payload");
+            return;
+          }
+
+          PublisherService.Publish(Topic, Payload);
+          Payload = "";
         },
         _ => PublisherService.ConnectionState == ClientConnectionState.Connected
       );
@@ -142,10 +160,14 @@ namespace Publisher.ViewModels
 
     #endregion Commands
 
+
     #region Models
     #endregion Models
 
+
     #region Services
+
+    #region Service - PublisherService
     private IPublisherService _publisherService;
     [Unity.Dependency]
     public IPublisherService PublisherService
@@ -162,6 +184,7 @@ namespace Publisher.ViewModels
           _publisherService.ConnectionFailed -= PublisherService_ConnectionFailed;
           _publisherService.ConnectionLost -= PublisherService_ConnectionLost;
           _publisherService.ConnectionClosed -= PublisherService_ConnectionClosed;
+          _publisherService.MessagePublished -= PublisherService_MessagePublished;
         }
 
         _publisherService = value;
@@ -175,9 +198,12 @@ namespace Publisher.ViewModels
           _publisherService.ConnectionFailed += PublisherService_ConnectionFailed;
           _publisherService.ConnectionLost += PublisherService_ConnectionLost;
           _publisherService.ConnectionClosed += PublisherService_ConnectionClosed;
+          _publisherService.MessagePublished += PublisherService_MessagePublished;
         }
       }
     }
+    #endregion Service - PublisherService
+
     #endregion Services
 
 
@@ -207,6 +233,10 @@ namespace Publisher.ViewModels
     private void PublisherService_ConnectionClosed(object sender, EventArgs e)
     {
       LogText += $"[SYS] Connection Closed!{Environment.NewLine}";
+    }
+    private void PublisherService_MessagePublished(object sender, MessagePublishedEventArgs e)
+    {
+      LogText += $"[{e.Topic}] Published: '{e.Payload}'{Environment.NewLine}";
     }
     #endregion Source Group - PublisherService
 

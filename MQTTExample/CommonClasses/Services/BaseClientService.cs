@@ -14,6 +14,9 @@ using System.Threading.Tasks;
 
 namespace CommonClasses.Services
 {
+  /// <summary>
+  /// Represents a base implementation of the <see cref="IClientService"/> interface.
+  /// </summary>
   public abstract class BaseClientService : IClientService
   {
     private const int MAX_CONNECTION_ATTEMPTS = 0;
@@ -47,7 +50,7 @@ namespace CommonClasses.Services
     }
 
 
-    public async void Connect(string address, ushort port)
+    public virtual async void Connect(string address, ushort port)
     {
       // Argument Validation //
       if (string.IsNullOrWhiteSpace(address))
@@ -96,7 +99,7 @@ namespace CommonClasses.Services
     }
 
 
-    public async void Disconnect()
+    public virtual async void Disconnect()
     {
       // If not connected: Error
       if (ConnectionState == ClientConnectionState.Disconnected)
